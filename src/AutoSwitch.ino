@@ -26,18 +26,18 @@ const uint8_t DELAY_POTENTIOMETER_PIN = A1; // Potentiometer connected to analog
 /*
     how to connect the potentiometer to the Arduino
 
-    Vcc ---\
-           O----> A1
-    GND ---/
+    Vcc ---[ 100 kΩ ]--- GND
+               ➚
+               o----- A1
 */
 const uint8_t BYPASS_BUTTON_PIN = 3; // Bypass button to control the vacuum
 /*
    how to connect the 10kΩ pull-down resistor
 
-   pin3 --+-- 10kΩ ---- GND
-          |
-          |   __L_
-          +---o  o----- Vcc
+   D3 --+--[ 10kΩ ]---- GND
+        |
+        |   __L_
+        +---o  o----- Vcc
 */
 
 const int SENSITIVITY = 100;                    // Sensor sensitivity from datasheet in mV/A. 5A sensor=185, 20A=100, 30A=66
@@ -213,11 +213,15 @@ void loop()
         }
         else
         {
-            // transition to state off from state on
-            trigger_deadline = millis() + get_relay_off_delay();
-            vacuum_state = false;
-            Serial.println("Will turn vacuum OFF");
+            if (vacuum_state == true)
+            { // transition to state off from state on
+                trigger_deadline = millis() + get_relay_off_delay();
+                vacuum_state = false;
+                Serial.println("Will turn vacuum OFF");
+            }
         }
+
+        // save the new state
         tool_state = new_tool_state;
     }
     else
